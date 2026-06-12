@@ -1,0 +1,96 @@
+import AdminDashboard from './pages/AdminDashboard.jsx'
+import AdminLogin from './pages/AdminLogin.jsx'
+import AdminPlaceholder from './pages/AdminPlaceholder.jsx'
+import CustomerLogin from './pages/CustomerLogin.jsx'
+import Reception from './pages/Reception.jsx'
+import Scheduling from './pages/Agendamento.jsx'
+
+export const routes = [
+  {
+    path: '/',
+    label: 'Login',
+    title: 'Login do cliente',
+    description: 'Entrada opcional para cliente acessar conta ou agendar sem login.',
+    group: 'public',
+    layout: 'auth',
+    showInMenu: false,
+    component: CustomerLogin,
+  },
+  {
+    path: '/inicio',
+    label: 'Recepcao',
+    title: 'Recepcao',
+    description: 'Tela inicial para o cliente conhecer servicos e agendar.',
+    group: 'public',
+    showInMenu: true,
+    component: Reception,
+  },
+  {
+    path: '/agendamento',
+    label: 'Agendamento',
+    title: 'Agendamento',
+    description: 'Formulario inicial para o cliente solicitar um horario.',
+    group: 'public',
+    showInMenu: true,
+    component: Scheduling,
+  },
+  {
+    path: '/admin/login',
+    label: 'Login admin',
+    title: 'Login administrativo',
+    description: 'Tela de acesso restrito para o administrador.',
+    group: 'admin',
+    showInMenu: false,
+    component: AdminLogin,
+  },
+  {
+    path: '/admin',
+    label: 'Dashboard',
+    title: 'Painel administrativo',
+    description: 'Resumo geral de agendamentos, clientes e financeiro.',
+    group: 'admin',
+    requiresAdmin: true,
+    showInMenu: true,
+    component: AdminDashboard,
+  },
+  {
+    path: '/admin/agenda',
+    label: 'Agenda',
+    title: 'Agenda administrativa',
+    description: 'Controle dos horarios, status e atendimentos do dia.',
+    group: 'admin',
+    requiresAdmin: true,
+    showInMenu: true,
+    component: AdminPlaceholder,
+  },
+  {
+    path: '/admin/clientes',
+    label: 'Clientes',
+    title: 'Clientes',
+    description: 'Lista de clientes, contatos e historico de atendimentos.',
+    group: 'admin',
+    requiresAdmin: true,
+    showInMenu: true,
+    component: AdminPlaceholder,
+  },
+  {
+    path: '/admin/servicos',
+    label: 'Servicos',
+    title: 'Servicos',
+    description: 'Cadastro de cortes, barba, combos, duracao e valores.',
+    group: 'admin',
+    requiresAdmin: true,
+    showInMenu: true,
+    component: AdminPlaceholder,
+  },
+  {
+    path: '/admin/financeiro',
+    label: 'Financeiro',
+    title: 'Financeiro',
+    description: 'Resumo de recebimentos, comissoes e fechamento de caixa.',
+    group: 'admin',
+    requiresAdmin: true,
+    showInMenu: true,
+    component: AdminPlaceholder,
+  },
+]
