@@ -58,6 +58,7 @@ function Scheduling({ customerSession, navigateTo }) {
   const [selectedTime, setSelectedTime] = useState('')
   const [bookedTimes, setBookedTimes] = useState([])
   const [confirmation, setConfirmation] = useState('')
+  const [messageType, setMessageType] = useState('success')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
@@ -82,6 +83,7 @@ function Scheduling({ customerSession, navigateTo }) {
       } catch (error) {
         if (isActive) {
           setConfirmation(error.message)
+          setMessageType('error')
           setBookedTimes([])
         }
       }
@@ -96,21 +98,25 @@ function Scheduling({ customerSession, navigateTo }) {
 
   async function handleSubmit(event) {
     event.preventDefault()
+    const form = event.currentTarget
     setConfirmation('')
+    setMessageType('success')
 
     if (!selectedDate || !selectedTime) {
       setConfirmation(
         'Escolha um dia e um horario antes de confirmar o agendamento.',
       )
+      setMessageType('error')
       return
     }
 
     if (bookedTimes.includes(selectedTime)) {
       setConfirmation('Este horario ja foi reservado. Escolha outro.')
+      setMessageType('error')
       return
     }
 
-    const formData = new FormData(event.currentTarget)
+    const formData = new FormData(form)
     const appointment = {
       client: formData.get('client'),
       phone: formData.get('phone'),
@@ -127,12 +133,14 @@ function Scheduling({ customerSession, navigateTo }) {
       setConfirmation(
         'Agendamento enviado. A barbearia ja consegue ver no painel administrativo.',
       )
-      event.currentTarget.reset()
+      setMessageType('success')
+      form.reset()
       setSelectedTime('')
       setSelectedDate('')
       setBookedTimes([])
     } catch (error) {
       setConfirmation(error.message)
+      setMessageType('error')
     } finally {
       setIsSubmitting(false)
     }
@@ -285,7 +293,13 @@ function Scheduling({ customerSession, navigateTo }) {
         <input type="hidden" name="time" value={selectedTime} required />
 
         {confirmation && (
-          <p className="mt-6 rounded-md border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-sm font-semibold text-emerald-100">
+          <p
+            className={`mt-6 rounded-md border px-4 py-3 text-sm font-semibold ${
+              messageType === 'success'
+                ? 'border-emerald-400/20 bg-emerald-400/10 text-emerald-100'
+                : 'border-red-400/20 bg-red-500/10 text-red-100'
+            }`}
+          >
             {confirmation}
           </p>
         )}
