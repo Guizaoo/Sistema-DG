@@ -27,7 +27,9 @@ export function requireAuth(request, _response, next) {
   try {
     const payload = jwt.verify(token, config.jwtSecret)
     const user = db
-      .prepare('SELECT id, name, phone, role, created_at FROM users WHERE id = ?')
+      .prepare(
+        'SELECT id, name, phone, email, email_verified, role, created_at FROM users WHERE id = ?',
+      )
       .get(payload.sub)
 
     if (!user) {
@@ -54,7 +56,9 @@ export function optionalAuth(request, _response, next) {
   try {
     const payload = jwt.verify(token, config.jwtSecret)
     const user = db
-      .prepare('SELECT id, name, phone, role, created_at FROM users WHERE id = ?')
+      .prepare(
+        'SELECT id, name, phone, email, email_verified, role, created_at FROM users WHERE id = ?',
+      )
       .get(payload.sub)
 
     if (user) {

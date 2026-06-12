@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { resendCustomerVerification } from '../api/auth'
 
 function CustomerLogin({
   customerSession,
@@ -9,11 +10,14 @@ function CustomerLogin({
 }) {
   const [mode, setMode] = useState('login')
   const [feedback, setFeedback] = useState('')
+  const [feedbackType, setFeedbackType] = useState('error')
+  const [pendingEmail, setPendingEmail] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   async function handleLogin(event) {
     event.preventDefault()
     setFeedback('')
+    setFeedbackType('error')
     setIsSubmitting(true)
 
     const formData = new FormData(event.currentTarget)
@@ -34,6 +38,7 @@ function CustomerLogin({
   async function handleSignup(event) {
     event.preventDefault()
     setFeedback('')
+    setFeedbackType('error')
     setIsSubmitting(true)
 
     const formData = new FormData(event.currentTarget)
@@ -42,9 +47,32 @@ function CustomerLogin({
       await onCustomerSignup({
         name: formData.get('name'),
         phone: formData.get('phone'),
+        email: formData.get('email'),
         password: formData.get('password'),
       })
-      navigateTo('/agendamento')
+      setPendingEmail(formData.get('email'))
+      setFeedbackType('success')
+      setFeedback(
+        'Conta criada. Confirme seu email pelo link enviado antes de entrar.',
+      )
+    } catch (error) {
+      setFeedback(error.message)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  async function handleResendVerification() {
+    if (!pendingEmail) return
+
+    setFeedback('')
+    setFeedbackType('error')
+    setIsSubmitting(true)
+
+    try {
+      await resendCustomerVerification(pendingEmail)
+      setFeedbackType('success')
+      setFeedback('Enviamos um novo link de confirmacao para seu email.')
     } catch (error) {
       setFeedback(error.message)
     } finally {
@@ -112,9 +140,10 @@ function CustomerLogin({
         <div className="mb-6 grid grid-cols-2 rounded-md border border-white/10 bg-black/40 p-1">
           <button
             type="button"
-            onClick={() => {
+          onClick={() => {
               setMode('login')
               setFeedback('')
+              setFeedbackType('error')
             }}
             className={`rounded px-3 py-2 text-sm font-semibold transition ${
               mode === 'login'
@@ -129,6 +158,7 @@ function CustomerLogin({
             onClick={() => {
               setMode('signup')
               setFeedback('')
+              setFeedbackType('error')
             }}
             className={`rounded px-3 py-2 text-sm font-semibold transition ${
               mode === 'signup'
@@ -212,8 +242,8 @@ function CustomerLogin({
               Crie sua conta.
             </h3>
             <p className="mt-2 text-sm leading-6 text-zinc-400">
-              Com cadastro, seus dados ficam prontos para os proximos
-              agendamentos.
+              Voce recebe um link no email para ativar sua conta antes do
+              primeiro acesso.
             </p>
           </div>
 
@@ -242,6 +272,17 @@ function CustomerLogin({
           </label>
 
           <label className="block space-y-2">
+            <span className="text-sm font-medium text-zinc-300">Email</span>
+            <input
+              name="email"
+              required
+              type="email"
+              placeholder="seuemail@exemplo.com"
+              className="w-full rounded-md border border-white/10 bg-black/40 px-3 py-3 text-sm text-zinc-50 outline-none transition placeholder:text-zinc-500 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20"
+            />
+          </label>
+
+          <label className="block space-y-2">
             <span className="text-sm font-medium text-zinc-300">Senha</span>
             <input
               name="password"
@@ -254,7 +295,13 @@ function CustomerLogin({
           </label>
 
           {feedback && (
-            <p className="rounded-md bg-red-950/50 px-3 py-2 text-sm font-medium text-red-200">
+            <p
+              className={`rounded-md px-3 py-2 text-sm font-medium ${
+                feedbackType === 'success'
+                  ? 'bg-emerald-950/50 text-emerald-100'
+                  : 'bg-red-950/50 text-red-200'
+              }`}
+            >
               {feedback}
             </p>
           )}
@@ -265,9 +312,18 @@ function CustomerLogin({
               disabled={isSubmitting}
               className="w-full rounded-md bg-amber-400 px-5 py-3 text-sm font-bold text-zinc-950 transition hover:bg-amber-300"
             >
-              {isSubmitting ? 'Cadastrando...' : 'Cadastrar e agendar'}
+              {isSubmitting ? 'Cadastrando...' : 'Cadastrar conta'}
             </button>
-            
+            {pendingEmail && (
+              <button
+                type="button"
+                onClick={handleResendVerification}
+                disabled={isSubmitting}
+                className="w-full rounded-md border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-white transition hover:border-amber-300/70 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                Reenviar email de confirmacao
+              </button>
+            )}
           </div>
         </form>
         )}

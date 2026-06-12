@@ -12,6 +12,10 @@ export function normalizePhone(phone) {
   return String(phone ?? '').replace(/\D/g, '')
 }
 
+export function normalizeEmail(email) {
+  return String(email ?? '').trim().toLowerCase()
+}
+
 export function createHttpError(status, message) {
   const error = new Error(message)
   error.status = status

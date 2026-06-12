@@ -5,6 +5,7 @@ API Node.js/Express para o projeto Agenda DG.
 ## O que este backend faz
 
 - Cadastro de cliente.
+- Confirmacao de email por link.
 - Login de cliente com token JWT.
 - Cadastro de agendamento.
 - Listagem de agendamentos para admin.
@@ -25,7 +26,22 @@ API Node.js/Express para o projeto Agenda DG.
 {
   "name": "Cliente Teste",
   "phone": "(85) 99999-1234",
+  "email": "cliente@email.com",
   "password": "1234"
+}
+```
+
+Depois do cadastro, a conta fica pendente ate o cliente confirmar o email.
+
+`GET /auth/verify-email?token=TOKEN_DO_EMAIL`
+
+Confirma a conta e devolve o token de login.
+
+`POST /auth/resend-verification`
+
+```json
+{
+  "email": "cliente@email.com"
 }
 ```
 
@@ -108,7 +124,10 @@ No Railway:
 ```txt
 JWT_SECRET=uma-chave-grande-e-segura
 CORS_ORIGIN=https://seu-site.vercel.app
+FRONTEND_URL=https://seu-site.vercel.app
 DATABASE_PATH=/data/agenda-dg.sqlite
+RESEND_API_KEY=re_xxxxxxxxx
+EMAIL_FROM=Agenda DG <seu-remetente@seudominio.com>
 ADMIN_NAME=Administrador
 ADMIN_PHONE=85999990000
 ADMIN_PASSWORD=uma-senha-segura

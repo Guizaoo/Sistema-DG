@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   loadAdminSession,
   loadCustomerSession,
@@ -7,6 +7,7 @@ import {
   logoutAdmin,
   logoutCustomer,
   registerCustomer,
+  verifyCustomerEmail,
 } from './api/auth'
 import { routes } from './routes.jsx'
 
@@ -96,10 +97,16 @@ function App() {
     navigateTo('/')
   }
 
-  async function handleCustomerSignup({ name, phone, password }) {
-    const user = await registerCustomer({ name, phone, password })
-    setCustomerSession(user)
+  async function handleCustomerSignup({ name, phone, email, password }) {
+    return registerCustomer({ name, phone, email, password })
   }
+
+  const handleVerifyCustomerEmail = useCallback(async (token) => {
+    const user = await verifyCustomerEmail(token)
+    setCustomerSession(user)
+
+    return user
+  }, [])
 
   async function handleCustomerLogin({ phone, password }) {
     const user = await loginCustomer({ phone, password })
@@ -196,6 +203,7 @@ function App() {
             onCustomerLogin={handleCustomerLogin}
             onCustomerLogout={handleCustomerLogout}
             onCustomerSignup={handleCustomerSignup}
+            onVerifyCustomerEmail={handleVerifyCustomerEmail}
             routes={menuRoutes}
           />
         </main>

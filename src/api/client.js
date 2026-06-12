@@ -1,4 +1,5 @@
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3001'
+const API_URL = (import.meta.env.VITE_API_URL ?? 'http://localhost:3001')
+  .replace(/\/$/, '')
 
 const CUSTOMER_TOKEN_KEY = 'agenda-dg:customer-token'
 const ADMIN_TOKEN_KEY = 'agenda-dg:admin-token'

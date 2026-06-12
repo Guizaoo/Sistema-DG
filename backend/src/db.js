@@ -23,9 +23,21 @@ db.exec(`
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
     phone TEXT NOT NULL UNIQUE,
+    email TEXT UNIQUE,
+    email_verified INTEGER NOT NULL DEFAULT 0,
     password_hash TEXT NOT NULL,
     role TEXT NOT NULL DEFAULT 'customer',
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS email_verifications (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    token TEXT NOT NULL UNIQUE,
+    expires_at TEXT NOT NULL,
+    used_at TEXT,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
   );
 
   CREATE TABLE IF NOT EXISTS appointments (
@@ -44,6 +56,23 @@ db.exec(`
     UNIQUE (date, time)
   );
 `)
+
+const userColumns = db.prepare('PRAGMA table_info(users)').all()
+const hasUserColumn = (name) => userColumns.some((column) => column.name === name)
+
+if (!hasUserColumn('email')) {
+  db.prepare('ALTER TABLE users ADD COLUMN email TEXT').run()
+}
+
+if (!hasUserColumn('email_verified')) {
+  db.prepare(
+    'ALTER TABLE users ADD COLUMN email_verified INTEGER NOT NULL DEFAULT 0',
+  ).run()
+}
+
+db.prepare(
+  'CREATE UNIQUE INDEX IF NOT EXISTS users_email_unique ON users(email) WHERE email IS NOT NULL',
+).run()
 
 const adminPhone = String(config.adminPhone ?? '').replace(/\D/g, '')
 

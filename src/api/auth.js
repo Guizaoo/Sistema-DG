@@ -9,15 +9,34 @@ import {
   setCustomerToken,
 } from './client'
 
-export async function registerCustomer({ name, phone, password }) {
+export async function registerCustomer({ name, phone, email, password }) {
   const data = await apiFetch('/auth/register', {
     method: 'POST',
-    body: JSON.stringify({ name, phone, password }),
+    body: JSON.stringify({ name, phone, email, password }),
   })
+
+  if (data.token) {
+    setCustomerToken(data.token)
+  }
+
+  return data
+}
+
+export async function verifyCustomerEmail(token) {
+  const data = await apiFetch(
+    `/auth/verify-email?token=${encodeURIComponent(token)}`,
+  )
 
   setCustomerToken(data.token)
 
   return data.user
+}
+
+export async function resendCustomerVerification(email) {
+  return apiFetch('/auth/resend-verification', {
+    method: 'POST',
+    body: JSON.stringify({ email }),
+  })
 }
 
 export async function loginCustomer({ phone, password }) {

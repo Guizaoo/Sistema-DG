@@ -1,6 +1,7 @@
 import AdminDashboard from './pages/AdminDashboard.jsx'
 import AdminLogin from './pages/AdminLogin.jsx'
 import AdminPlaceholder from './pages/AdminPlaceholder.jsx'
+import ConfirmEmail from './pages/ConfirmEmail.jsx'
 import CustomerLogin from './pages/CustomerLogin.jsx'
 import Reception from './pages/Reception.jsx'
 import Scheduling from './pages/Agendamento.jsx'
@@ -33,6 +34,16 @@ export const routes = [
     group: 'public',
     showInMenu: true,
     component: Scheduling,
+  },
+  {
+    path: '/confirmar-email',
+    label: 'Confirmar email',
+    title: 'Confirmar email',
+    description: 'Ativacao da conta do cliente por link enviado ao email.',
+    group: 'public',
+    layout: 'auth',
+    showInMenu: false,
+    component: ConfirmEmail,
   },
   {
     path: '/admin/login',
